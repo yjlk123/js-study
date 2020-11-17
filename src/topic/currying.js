@@ -1,4 +1,6 @@
 // 函数柯里化
+// https://www.zhangxinxu.com/wordpress/2013/02/js-currying/
+
 
 // 柯里化的特性：1. 参数复用， 2.提前返回 3.延迟调用
 // 柯里化的公式差不多是：
