@@ -284,8 +284,9 @@ console.log(a1.__proto__);
 console.log(a2.__proto__)
 
 console.log('change------');
-a1.card.push('2')
-// a1.card = [] // 上下这两种修改方式是不同的，上面是可以引起其他的实例一样改动，而下面这张方式，其他实例不会变化
+a1.name = '222'
+// a1.card.push('2')
+a1.card = [] // 上下这两种修改方式是不同的，上面是可以引起其他的实例一样改动，而下面这张方式，其他实例不会变化
 
 console.log(a1.card);
 console.log(a2.card)
