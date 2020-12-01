@@ -1,39 +1,48 @@
 // // 1. promise 用法
 
-// （1）原始的回调函数方式
-function loadImg (src, callback, fail) {
-    let img = document.createElement('img')
-    img.onload = function () {
-        callback(img)
-    }
-    img.onerror = function () {
-        fail()
-    }
-    img.src = src
-}
+// // （1）原始的回调函数方式
+// function loadImg (src, callback, fail) {
+//     let img = document.createElement('img')
+//     img.onload = function () {
+//         callback(img)
+//     }
+//     img.onerror = function () {
+//         fail()
+//     }
+//     img.src = src
+// }
 
-let src = 'http://abc.png'
-loadImg(src, function (img) {
-    console.log(img.width);
-}, function () {
-    console.log('load image failed!');
-})
+// let src = 'http://abc.png'
+// loadImg(src, function (img) {
+//     console.log(img.width);
+// }, function () {
+//     console.log('load image failed!');
+// })
 
 
-// （2）使用 promise 的方式
-function loadImg (src) {
-    let promise = new Promise((resolve, reject) => {
-        let img = document.createElement('img')
-        img.onload = function () {
-            resolve(img)
-        }
-        img.onerror = function () {
-            reject('error')
-        }
-        img.src = src
-    })
-    return promise
-}
+
+// // （2）使用 promise 的方式
+// // then 中有2个参数，第一个是状态变成成功后应该执行的回调函数，第二个参数是状态变成失败后应该执行的回调函数.注意是一个函数里的两个参数，
+// // 失败时的函数是在第二个参数里，而不是在 .catch 里捕获的,这2个参数也不需要从 loadImg 传进去，直接就在 Promise 的构造函数的参数里，
+// // 由最后调用这个 promise 的时候传进去实参, 也就是 Promise 的 then 方法里传入的函数，见下面 2.
+
+// function loadImg (src) {
+//     let promise = new Promise((resolve, reject) => {
+//         let img = document.createElement('img')
+//         img.onload = function () {
+//             resolve(img)
+//         }
+//         img.onerror = function () {
+//             reject('error')
+//         }
+//         img.src = src
+//     })
+//     return promise
+// }
+
+
+
+
 
 // 2. Promise 的用法2: 链式调用
 function fn () {
@@ -49,30 +58,19 @@ function fn () {
             setTimeout(function () {
                 console.log('2')
                 resolve(2 + value);
-            }, 1000);
+            }, 3000);
         });
     }
     p1().then(function (res) {
         console.log(res); // 1000ms后输出1
         return Promise.resolve(res); // 显式的return一个Promise对象
     }).then(p2).then(function (res) {
-        console.log(res); // 再过1000ms后输出3
+        console.log(res); // 再过3000ms后输出2,3
     });
 }
 
+fn()
 
-// 3.promise.race 的用法  https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/race
-const promise1 = new Promise((resolve, reject) => {
-    setTimeout(resolve, 500, 'one');
-});
 
-const promise2 = new Promise((resolve, reject) => {
-    setTimeout(resolve, 100, 'two');
-});
 
-Promise.race([promise1, promise2]).then((value) => {
-    console.log(value);
-    // Both resolve, but promise2 is faster
-});
-  // expected output: "two"
 
