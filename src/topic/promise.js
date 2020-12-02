@@ -40,6 +40,11 @@
 //     return promise
 // }
 
+// 调用:
+// loadImg.then(res => {
+
+// })
+
 
 
 
