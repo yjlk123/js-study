@@ -72,5 +72,7 @@ function fn () {
 fn()
 
 
+// 3.接着看 eventloop-promise.js 这个文件，学习 promise 链式调用的事件循环
+
 
 

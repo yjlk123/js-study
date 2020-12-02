@@ -15,47 +15,43 @@
 //     }, 0)
 // }
 
+// fn()
 
 
+// 2. https://juejin.cn/post/6844903638238756878
+console.log('1');
 
-// // 2
-// function fn () {
-//     console.log('1');
+setTimeout(function() { // a
+    console.log('2');
+    process.nextTick(function() { // b
+        console.log('3');
+    })
+    new Promise(function(resolve) { // c
+        console.log('4');
+        resolve();
+    }).then(function() { // d
+        console.log('5')
+    })
+})
+process.nextTick(function() { // e
+    console.log('6');
+})
+new Promise(function(resolve) {
+    console.log('7');
+    resolve();
+}).then(function() {  // f
+    console.log('8')
+})
 
-//     setTimeout(function () { // a
-//         console.log('2');
-//         process.nextTick(function () {
-//             console.log('3');
-//         })
-//         new Promise(function (resolve) {
-//             console.log('4');
-//             resolve();
-//         }).then(function () {
-//             console.log('5')
-//         })
-//     })
-//     process.nextTick(function () {
-//         console.log('6');
-//     })
-//     new Promise(function (resolve) {
-//         console.log('7');
-//         resolve();
-//     }).then(function () {
-//         console.log('8')
-//     })
-
-//     setTimeout(function () { // b
-//         console.log('9');
-//         process.nextTick(function () {
-//             console.log('10');
-//         })
-//         new Promise(function (resolve) {
-//             console.log('11');
-//             resolve();
-//         }).then(function () {
-//             console.log('12')
-//         })
-//     })
-// } // 1，7，6，8，2，4，3，5，9，11，10，12
-
-
+setTimeout(function() { // g
+    console.log('9');
+    process.nextTick(function() { // h
+        console.log('10');
+    })
+    new Promise(function(resolve) {
+        console.log('11');
+        resolve();
+    }).then(function() { // i
+        console.log('12')
+    })
+})
