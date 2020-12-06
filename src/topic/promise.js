@@ -49,48 +49,116 @@
 
 
 
-// 2. Promise 的用法2: 链式调用
-function fn () {
-    function p1 () {
-        return new Promise(function (resolve, reject) {
-            setTimeout(function () {
-                resolve(1);
-            }, 1000);
-        });
-    }
-    function p2 (value) {
-        return new Promise(function (resolve, reject) {
-            setTimeout(function () {
-                console.log('2')
-                resolve(2 + value);
-            }, 3000);
-        });
-    }
-    p1().then(function (res) {
-        console.log(res); // 1000ms后输出1
-        return Promise.resolve(res); // 显式的return一个Promise对象
-    }).then(p2).then(function (res) {
-        console.log(res); // 再过3000ms后输出2,3
-    });
-}
+// // 2.1 Promise 的用法2: 链式调用
+// function fn () {
+//     function p1 () {
+//         return new Promise(function (resolve, reject) {
+//             setTimeout(function () {
+//                 resolve(1);
+//             }, 1000);
+//         });
+//     }
+//     function p2 (value) {
+//         return new Promise(function (resolve, reject) {
+//             setTimeout(function () {
+//                 console.log('2')
+//                 resolve(2 + value);
+//             }, 3000);
+//         });
+//     }
+//     p1().then(function (res) {
+//         console.log(res); // 1000ms后输出1
+//         return Promise.resolve(res); // 显式的return一个Promise对象
+//     }).then(p2).then(function (res) {
+//         console.log(res); // 再过3000ms后输出2,3
+//     });
+// }
 
-fn()
-
-
-// 3.接着看 eventloop-promise.js 这个文件，学习 promise 链式调用的事件循环
+// fn()
 
 
-// 4.手动实现 promise
-// 4.1 基本的功能
-function Promise(fn) {
-    let value = null; // 异步函数执行后的结果
-    let deferred; // 异步函数执行后，真正要执行的回调函数
-    this.then = function(onFulfilled) {
-      deferred = onFulfilled;
-    }
-    function resolve(newValue) {
-      value = newValue;
-      deferred(value);
-    }
-    fn(resolve);
-  }
+// // 2.2 Promise 的使用2
+// // .then 还可以后面继续链式调用 .then 或 .catch, 要注意的是如果链式调用，前一个 .then 或 .catch 需要显示地返回一个 Promise 对象（注意：意思是 .then 的参数是个函数，是返回一个 promise 对象），
+// // 否则会隐式地以  undefined 返回： return Promise.resolve(undefined), 那么后一个链式里获取到的就是 undefined 了.不过一般返回的都是 第一个 then 里
+// // 用到的那个结果，也可以返回其他的东西，但都必须是 promise 对象
+
+// let p = Promise.reject("error");
+// p.catch(err => {
+//     console.log("catch " + err); // catch error
+//     // 这里会默认return Promise.resolve(undefined);
+// }).then(res => {
+//     console.log(res); // undefined
+// });
+
+
+
+// 2.3 如果是传入一个 Promise 对象呢，直接返回，这个过程是语法糖，这题涉及到 Promise 的循环调用
+// // 直接调用 resolve:
+// Let p1 = Promise.resolve('abc')
+// // 等价于： 也就是 Promise.resolve() 是下面这个写法的语法糖：
+// let p2 = new Promise((resolve, reject) => {
+//   resolve('abc');
+// })
+
+let p = new Promise((resolve,reject) => {
+    setTimeout(() => {
+        resolve('success');
+    },500);
+});
+let pp = Promise.resolve(p);
+console.log(pp); // A 注意这里：因为 pp 依赖于进入宏任务队列的结果，所以主线程中虽然执行 pp 了，但是它的结果显示 Promise 处于 pending 状态。对比 B 处
+
+pp.then(result => {
+    console.log(result);
+    console.log(pp) // 对比 A
+});
+console.log(pp == p);
+
+
+
+// // 3.接着看 eventloop-promise.js 这个文件，学习 promise 链式调用的事件循环
+
+
+// // 4.手动实现 promise
+// // 4.1 基本的功能
+// // 总结理解，如何记忆： Promise 的内部结构要从下往上理解，最终做的操作是执行传进去的异步函数 fn, 这个 fn 的参数就是 resolve 函数; 
+// // resolve 函数里做的操作是传进异步函数的结果来执行回调函数，不过这个回调函数是在 then 里面保存到本地变量了的， resolve 里还会保存异步操作的结果到本地变量.
+// // 可以这么说，其实主要承上启下的是 resolve 这个 Promise 的内部函数，往上延伸，往下扩展都围绕着它来就好记了。
+// // 关键点： 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数
+// function Promise (fn) {
+//     let value = null; // 异步函数执行后的结果
+//     let deferred; // 异步函数执行后，真正要执行的回调函数，保存到本地变量
+//     this.then = function (onFulfilled) { // Promise 的 then 方法用于注册回调函数，即赋值给内部的 deferred
+//         deferred = onFulfilled;
+//     }
+//     function resolve (newValue) { // 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数
+//         value = newValue;
+//         deferred(value);
+//     }
+//     fn(resolve); // 创建 Promise 实例的参数是 fn, 并将其内部的 resolve 方法作为参数传递给异步函数
+// }
+
+
+// // 4.2 改进1
+// // 目前的代码只能注册一个回调方法，这显然不符合我们的预期，所以将内部的deferred修改为deferreds数组，相应的执行resolve时，也要遍历deferreds数组依次执行：
+// function Promise (fn) {
+//     let value = null;
+//     let deferreds = [];
+//     this.then = function (onFulfilled) {
+//         deferreds.push(onFulfilled);
+//     }
+//     function resolve (newValue) {
+//         value = newValue;
+//         deferreds.forEach((deferred) => {
+//             deferred(value);
+//         });
+//     }
+//     fn(resolve);
+// }
+
+// // 4.3 改进2
+// // 实现 then 的链式调用，较简单
+// this.then = function (onFulfilled) {
+//     deferreds.push(onFulfilled);
+//     return this; // 加了一句 return this，这样就可以链式调用了
+// }
