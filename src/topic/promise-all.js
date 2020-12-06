@@ -14,7 +14,7 @@ Promise.myall = function (arr) {
                 // 同时也能处理arr数组中非Promise对象
                 if (!(arr[i] instanceof Promise)) {
                     res[i] = arr[i]
-                    if (++count === arr.length)
+                    if (++count === arr.length) // 如果是用这个来做判断条件的话: result.length === arr.length 这样写有个错误的问题，如果最后一项不是最后一个完成的，那么就有空的项
                         resolve(res)
                 } else {
                     arr[i].then(data => {
@@ -31,26 +31,6 @@ Promise.myall = function (arr) {
     })
 }
 
-// 2.手动实现 promise.all 第二种书写方式，个人觉得第二种写得更简洁
-// https://www.jianshu.com/p/c8af0c130ccb
 function isPromise (obj) {
     return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
-}
-
-const myPromiseAll = (arr) => {
-    let result = [];
-    return new Promise((resolve, reject) => {
-        for (let i = 0; i < arr.length; i++) {
-            if (isPromise(arr[i])) {
-                arr[i].then((data) => {
-                    result[i] = data;
-                    if (result.length === arr.length) {
-                        resolve(result)
-                    }
-                }, reject) // 如果失败，直接用 new 的这个 Promise 的 reject 函数作为错误处理函数，因为它本身就是个函数
-            } else {
-                result[i] = arr[i];
-            }
-        }
-    })
 }
