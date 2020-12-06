@@ -80,4 +80,17 @@ fn()
 // 3.接着看 eventloop-promise.js 这个文件，学习 promise 链式调用的事件循环
 
 
-
+// 4.手动实现 promise
+// 4.1 基本的功能
+function Promise(fn) {
+    let value = null; // 异步函数执行后的结果
+    let deferred; // 异步函数执行后，真正要执行的回调函数
+    this.then = function(onFulfilled) {
+      deferred = onFulfilled;
+    }
+    function resolve(newValue) {
+      value = newValue;
+      deferred(value);
+    }
+    fn(resolve);
+  }
