@@ -83,3 +83,28 @@
 //     });
 
 // 4.接着看 eventloop.js 这个文件，对前面的知识进行练习
+
+
+
+
+
+// // 5.练习例子
+// let p1 = new Promise((resolve, reject) => {
+//     setTimeout(function() {
+//       resolve(1);
+//     }, 1000);
+//   });
+//   function p2(value) {
+//     return new Promise((resolve, reject) => {
+//       setTimeout(() => {
+//         resolve(2 + value);
+//       }, 1000);
+//     });
+//   }
+//   p1.then(res => {
+//     console.log(res);
+//   }).then(p2).then(res => {
+//     console.log(res);
+//   });
+  
+

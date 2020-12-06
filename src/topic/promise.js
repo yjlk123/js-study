@@ -92,31 +92,66 @@
 
 
 
-// 2.3 如果是传入一个 Promise 对象呢，直接返回，这个过程是语法糖，这题涉及到 Promise 的循环调用
-// // 直接调用 resolve:
-// Let p1 = Promise.resolve('abc')
-// // 等价于： 也就是 Promise.resolve() 是下面这个写法的语法糖：
-// let p2 = new Promise((resolve, reject) => {
-//   resolve('abc');
-// })
+// // 2.3 如果是传入一个 Promise 对象呢，直接返回，这个过程是语法糖，这题涉及到 Promise 的循环调用
+// // // 直接调用 resolve:
+// // Let p1 = Promise.resolve('abc')
+// // // 等价于： 也就是 Promise.resolve() 是下面这个写法的语法糖：
+// // let p2 = new Promise((resolve, reject) => {
+// //   resolve('abc');
+// // })
 
-let p = new Promise((resolve,reject) => {
+// let p = new Promise((resolve,reject) => {
+//     setTimeout(() => {
+//         resolve('success');
+//     },500);
+// });
+// let pp = Promise.resolve(p);
+// console.log(pp); // A 注意这里：因为 pp 依赖于进入宏任务队列的结果，所以主线程中虽然执行 pp 了，但是它的结果显示 Promise 处于 pending 状态。对比 B 处
+
+// pp.then(result => {
+//     console.log(result);
+//     console.log(pp) // 对比 A
+// });
+// console.log(pp == p);
+
+
+
+// 2.4.1 Promise 的错误捕获
+// (1)异步代码的运行时错误无法被自动 reject 进而被 catch 捕获，而是直接报错 ?????????
+let p3 = new Promise((resolve, reject) => {
     setTimeout(() => {
-        resolve('success');
-    },500);
-});
-let pp = Promise.resolve(p);
-console.log(pp); // A 注意这里：因为 pp 依赖于进入宏任务队列的结果，所以主线程中虽然执行 pp 了，但是它的结果显示 Promise 处于 pending 状态。对比 B 处
+      throw "error";
+    }, 0);
+  });
+  
+  p3.catch(err => {
+    console.log("catch " + err); // 不会被执行
+  });
+  
 
-pp.then(result => {
-    console.log(result);
-    console.log(pp) // 对比 A
+// (2)但是若异步操作抛出错误的回调是在 Promise 的 catch 之前执行的，其实还是可以被 catch 所捕获到的，比如 Promise 的 then 方法所抛出的错误：
+let p = Promise.resolve();
+let p1 = new Promise(function (resolve, reject) {
+  p.then(()=>{ 
+    throw 123;
+  }).catch(e => {
+    reject(e);
+  });
 });
-console.log(pp == p);
+
+p1.catch(err => {
+  console.log(err); // 123，错误成功被捕获
+});
+
+
 
 
 
 // // 3.接着看 eventloop-promise.js 这个文件，学习 promise 链式调用的事件循环
+
+
+
+
 
 
 // // 4.手动实现 promise
@@ -139,6 +174,9 @@ console.log(pp == p);
 // }
 
 
+
+
+
 // // 4.2 改进1
 // // 目前的代码只能注册一个回调方法，这显然不符合我们的预期，所以将内部的deferred修改为deferreds数组，相应的执行resolve时，也要遍历deferreds数组依次执行：
 // function Promise (fn) {
@@ -155,6 +193,9 @@ console.log(pp == p);
 //     }
 //     fn(resolve);
 // }
+
+
+
 
 // // 4.3 改进2
 // // 实现 then 的链式调用，较简单
