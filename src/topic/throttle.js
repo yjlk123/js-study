@@ -1,11 +1,12 @@
 // 函数节流
 // 意思是有节制地执行，而不是毫无节制地触发一次就执行一次，即一段时间内，只执行一次
+// 抓取一个关键的点：就是执行的时机。要做到控制执行的时机，我们可以通过「一个开关」，与定时器setTimeout结合完成
 
 // 1.节流函数的实现
 function throttle(fn, delay){
     let flag = true, timer = null;
-    return function(...args){
-        let context = this
+    return function(...args){ // 这种一般都是会返回一个函数，真正要执行的函数通过 参数传进去
+        let context = this // 注意这里
         if(!flag){
             return
         }
