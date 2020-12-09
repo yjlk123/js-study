@@ -4,8 +4,8 @@
 
 // 1.防抖函数的实现
 function debounce (fn, delay) {
-    let flag = true, timer = null;
-    return function (...args) {
+    let timer = null;
+    return function (...args) { // 这种一般都是会返回一个函数，真正要执行的函数通过 参数传进去. 防抖和节流都是
         let context = this
         if(timer) clearTimeout(timer)
         timer = setTimeout(() => {
