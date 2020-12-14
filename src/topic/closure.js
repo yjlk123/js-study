@@ -1,7 +1,7 @@
 // 闭包
 
 
-// 1.正确闭包
+// 1.1正确闭包
 function fn1(){
     for (var i = 0; i < 5; i++) {
         (function(i) {
@@ -11,6 +11,9 @@ function fn1(){
         })(i);
       }
 }
+
+// 1.2 使用 let 代替 var 形成块级作用域
+// https://juejin.cn/post/6854573211443544078#heading-35
 
 
 // 2.删除了对 i 的引用

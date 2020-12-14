@@ -45,16 +45,15 @@ function getName() {
     console.log(5);
 }
 
-
-
 // 请写出以下的输出结果  
 // 优先级：成员访问 > new > 函数调用， 在这里是：new Foo() >  Foo() > new Foo  ，尽管.的优先级高，但()并不能被.调用，所以会将new Foo()的值求出来再去.getName
+// new 之后返回的是一个对象，所以构造函数里返回的是这个新的对象，即 this 变成了 'object', 而不再是 window
 Foo.getName(); // 2
 getName(); // 4
 Foo().getName(); // this is[object Window], 1
 getName(); // 1
 new Foo.getName(); // 2    优先级： (new (Foo.getName))()  就算删掉 () 输出结果也没变化，意思是 () 没有起作用？??????
-new Foo().getName(); // this is[object Object], google    尽管.的优先级高，但()并不能被.调用，所以会将new Foo()的值求出来再去.getName
+new Foo().getName(); // this is[object Object], google    尽管.的优先级高，但()并不能被.调用，所以会将new Foo()的值求出来再去.getName // 有个小技巧，首先找属性调用的 ".", 然后看 new , 一定要给它分配一个最近的 (), 然后最后顺序是函数调用
 new new Foo().getName(); // this is[object Object], google     new ((new Foo()).getName)() => new (foo.getName)()
 console.log('baidu' && 'google'); // 'google'
 
