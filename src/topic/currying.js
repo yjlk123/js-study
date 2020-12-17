@@ -12,11 +12,11 @@
 
 
 // 1.柯里化的基本特性1：复用参数
-var currying = function(fn) {
+var currying = function (fn) {
     // fn 指官员消化老婆的手段
     var args = [].slice.call(arguments, 1); // A
     // args 指的是那个合法老婆
-    return function() {
+    return function () {
         // 已经有的老婆和新搞定的老婆们合成一体，方便控制
         var newArgs = args.concat([].slice.call(arguments)); // B 注意： A 和 B 的 arguments 是不一样的，并不是同一个
         // 这些老婆们用 fn 这个手段消化利用，完成韦小宝前辈的壮举并返回
@@ -26,14 +26,14 @@ var currying = function(fn) {
 
 // 下为官员如何搞定7个老婆的测试
 // 获得合法老婆
-var getWife = currying(function() {
+var getWife = currying(function () {
     var allWife = [].slice.call(arguments);
     // allwife 就是所有的老婆的，包括暗渡陈仓进来的老婆
     console.log(allWife.join(";"));
 }, "合法老婆");
 
 // 获得其他6个老婆
-getWife("大老婆","小老婆","俏老婆","刁蛮老婆","乖老婆","送上门老婆");
+getWife("大老婆", "小老婆", "俏老婆", "刁蛮老婆", "乖老婆", "送上门老婆");
 
 // 换一批老婆
 getWife("超越韦小宝的老婆");
@@ -43,29 +43,29 @@ getWife("超越韦小宝的老婆");
 
 // 2.柯里化的特性2：提前返回
 // 2.1 兼容浏览器事件绑定的一般写法：
-var addEvent = function(el, type, fn, capture) {
+var addEvent = function (el, type, fn, capture) {
     if (window.addEventListener) {
-        el.addEventListener(type, function(e) {
+        el.addEventListener(type, function (e) {
             fn.call(el, e);
         }, capture);
     } else if (window.attachEvent) {
-        el.attachEvent("on" + type, function(e) {
+        el.attachEvent("on" + type, function (e) {
             fn.call(el, e);
         });
     }
 };
 
 // 2.2 柯里化写法：
-var addEvent = (function(){
+var addEvent = (function () {
     if (window.addEventListener) {
-        return function(el, sType, fn, capture) {
-            el.addEventListener(sType, function(e) {
+        return function (el, sType, fn, capture) {
+            el.addEventListener(sType, function (e) {
                 fn.call(el, e);
             }, (capture));
         };
     } else if (window.attachEvent) {
-        return function(el, sType, fn, capture) {
-            el.attachEvent("on" + sType, function(e) {
+        return function (el, sType, fn, capture) {
+            el.attachEvent("on" + sType, function (e) {
                 fn.call(el, e);
             });
         };
@@ -79,9 +79,9 @@ var addEvent = (function(){
 // 3.柯里化的特性3：延迟计算
 // https://www.zhangxinxu.com/wordpress/2013/02/js-currying/
 
-var curryWeight = function(fn) {
+var curryWeight = function (fn) {
     var _fishWeight = [];
-    return function() { // 每次调用 addWeight 这个变量，实际上执行的是这个函数，即 arguments 是调用 addWeight 这个变量时的参数
+    return function () { // 每次调用 addWeight 这个变量，实际上执行的是这个函数，即 arguments 是调用 addWeight 这个变量时的参数
         if (arguments.length === 0) {
             return fn.apply(null, _fishWeight); // A
         } else {
@@ -91,9 +91,9 @@ var curryWeight = function(fn) {
     }
 };
 var fishWeight = 0;
-var addWeight = curryWeight(function() {
-    var i=0; len = arguments.length; // 注意这里 arguments 是在调用这个函数时才确定的，就是在 A 这里才确定了，因为 arguments 就是指的实参
-    for (i; i<len; i+=1) {
+var addWeight = curryWeight(function () {
+    var i = 0; len = arguments.length; // 注意这里 arguments 是在调用这个函数时才确定的，就是在 A 这里才确定了，因为 arguments 就是指的实参
+    for (i; i < len; i += 1) {
         fishWeight += arguments[i];
     }
 });
@@ -112,32 +112,32 @@ console.log(fishWeight);    // 12.5
 
 
 //5. 支持多参数传递 todo 有问题, 这段代码大概看一下就行
-function progressCurrying(fn, args){
+function progressCurrying (fn, args) {
     let _this = this
     let len = fn.length
     let args = args || []
 
-    return function(){
+    return function () {
         let _args = Array.prototype.slice.call(arguments)
         Array.prototype.push.apply(args, _args)
 
-        if(_args.length < len){
+        if (_args.length < len) {
             return progressCurrying(_this, fn, _args)
         }
         return fn.apply(this, _args)
     }
 }
 
-progressCurrying(function(a){
+progressCurrying(function (a) {
     console.log(a)
 })
 
 
 
 // 6. 用柯里化实现的 bind
-function curryFn(){
+function curryFn () {
     let fn = [].slice.apply(arguments, 0)
-    return function(context){
+    return function (context) {
         return fn.apply(context, [].slice.apply(arguments, 2))
     }
 }
@@ -146,9 +146,22 @@ let obj = {
     name: '123'
 }
 
-let myBind = curryFn(function(){
+let myBind = curryFn(function () {
     console.log(this.name)
 })
 
 myBind(obj)
 
+// 7.flat
+function flat (array) {
+    let result = []
+    for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        if (element instanceof Array) {
+            flat(element)
+        } else{
+            result.push(element)
+        }
+    }
+    return result
+}

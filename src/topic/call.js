@@ -26,7 +26,7 @@ Function.prototype.call2 = function(context) {
     context.fn = this;
     var args = [];
     for(var i = 1, len = arguments.length; i < len; i++) {
-        args.push('arguments[' + i + ']');
+        args.push('arguments[' + i + ']'); // 不能用 Array.prototype.slice.call 因为这里就是要实现 call
     }
     eval('context.fn(' + args +')');
     delete context.fn;

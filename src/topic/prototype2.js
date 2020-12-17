@@ -25,11 +25,13 @@ console.log('------------------------');
 
 
 // 3.Object.create() 方式生成对象
-// 这第3种情况，其实是链接在第2种情况后面的，想象一下图即可知道
+// 这是第3种情况，其实是链接在第2种情况后面的，想象一下图即可知道
 let c1 = {}
 let c2 = Object.create(c1)
 console.log(c2.__proto__ === c1); // true
 console.log(c2.__proto__ === c2.constructor.prototype); // false
+console.log(c2.__proto__ === c1.constructor); // false
+console.log(c2.__proto__ ); // {}
 
 
 console.log('------------------------');
@@ -86,7 +88,7 @@ console.log(p.__proto__ === p.constructor.prototype); // false  如果不手动�
 console.log(p.constructor.prototype === Object.prototype); // true
 
 
-
+console.log('*************************');
 // 9.Object.create 方式创建的对象，更改原对象，会影响其他的实例吗？？？？？？？
 // (1)
 let d1 = {
@@ -96,8 +98,8 @@ let d2 = Object.create(d1)
 let d3 = Object.create(d1)
 
 // 这两行就是为了验证，如果是改源对象的属性值会影响到所有的实例，但如果只改其中一个实例的属性，不会影响别的实例
-d2.name = '123'
-// d1.name = '123'
+// d2.name = '123'
+d1.name = '123'
 console.log(d2.name);
 console.log(d3.name);
 

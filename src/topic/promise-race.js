@@ -48,7 +48,7 @@ Promise.myrace = function (arr) {
         for (let i = 0; i < arr.length; i++) {
             // 同时也能处理arr数组中非Promise对象
             if (!(arr[i] instanceof Promise)) {
-                Promise.resolve(arr[i]).then(resolve, reject)
+                Promise.resolve(arr[i]).then(resolve, reject) // 不是 Promise 的通过 Promise.resolve 将它变成 Promise 对象，然后就可以用 then 了
             } else {
                 arr[i].then(resolve, reject)
             }

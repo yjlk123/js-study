@@ -7,10 +7,14 @@
 //   }
 // console.log(test);
 
-// 2. 同一个变量声明会忽略后面的声明，只有赋值会覆盖
+// 2. 同一个变量声明会忽略后面的声明，只有赋值会覆盖。函数的重复声明会取最后一个
 var test
 function test(){
     alert(4);
+  }
+console.log(test);
+function test(){
+    alert(5);
   }
 console.log(test);
 test = '123'

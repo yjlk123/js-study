@@ -64,3 +64,25 @@ console.log('baidu' && 'google'); // 'google'
 // }
 // Foo()
 // getName()
+
+// 4.new
+function myNew (fn){
+    let obj = Object.create(fn.prototype)
+    let args = Array.prototype.slice(arguments, 1)
+    let result = fn.apply(obj, args)
+    return typeof result === 'object' ? result : obj
+}
+
+// 5.去重
+function deWeight(){
+    let result = arr.filter((item, index, arr) => {
+        return arr.indexOf(item) === index
+    })
+    return result
+}
+function deWeight2(){
+    let result = arr.reduce((pre, cur, index, arr) => {
+        return pre.includes(cur) ? pre : [...pre, cur]
+    }, [])
+    return result
+}

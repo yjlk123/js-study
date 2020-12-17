@@ -35,13 +35,3 @@
 // }
 
 
-
-// function Foo () {
-//     getName = function () { // 到全局
-//         console.log(1);
-//     };
-//     console.log('this is' + this)
-//     return this;
-// }
-// Foo()
-// getName()

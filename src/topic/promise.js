@@ -154,24 +154,24 @@ p1.catch(err => {
 
 
 
-// // 4.手动实现 promise
-// // 4.1 基本的功能
-// // 总结理解，如何记忆： Promise 的内部结构要从下往上理解，最终做的操作是执行传进去的异步函数 fn, 这个 fn 的参数就是 resolve 函数; 
-// // resolve 函数里做的操作是传进异步函数的结果来执行回调函数，不过这个回调函数是在 then 里面保存到本地变量了的， resolve 里还会保存异步操作的结果到本地变量.
-// // 可以这么说，其实主要承上启下的是 resolve 这个 Promise 的内部函数，往上延伸，往下扩展都围绕着它来就好记了。
-// // 关键点： 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数
-// function Promise (fn) {
-//     let value = null; // 异步函数执行后的结果
-//     let deferred; // 异步函数执行后，真正要执行的回调函数，保存到本地变量
-//     this.then = function (onFulfilled) { // Promise 的 then 方法用于注册回调函数，即赋值给内部的 deferred
-//         deferred = onFulfilled;
-//     }
-//     function resolve (newValue) { // 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数
-//         value = newValue;
-//         deferred(value);
-//     }
-//     fn(resolve); // 创建 Promise 实例的参数是 fn, 并将其内部的 resolve 方法作为参数传递给异步函数
-// }
+// 4.手动实现 promise
+// 4.1 基本的功能
+// 总结理解，如何记忆： Promise 的内部结构要从下往上理解，最终做的操作是执行传进去的异步函数 fn, 这个 fn 的参数就是 resolve 函数; 
+// resolve 函数里做的操作是传进异步函数的结果来执行回调函数，不过这个回调函数是在 then 里面保存到本地变量了的， resolve 里还会保存异步操作的结果到本地变量.
+// 可以这么说，其实主要承上启下的是 resolve 这个 Promise 的内部函数，往上延伸，往下扩展都围绕着它来就好记了。
+// 关键点： 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数
+function Promise (fn) {
+    let value = null; // 异步函数执行后的结果
+    let deferred; // 异步函数执行后，真正要执行的回调函数，保存到本地变量
+    this.then = function (onFulfilled) { // Promise 的 then 方法用于注册回调函数，即赋值给内部的 deferred
+        deferred = onFulfilled;
+    }
+    function resolve (newValue) { // 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数
+        value = newValue;
+        deferred(value);
+    }
+    fn(resolve); // 创建 Promise 实例的参数是 fn, 并将其内部的 resolve 方法作为参数传递给异步函数
+}
 
 
 
