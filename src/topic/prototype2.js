@@ -12,16 +12,20 @@ let a = new A('小 a')
 
 console.log(a.__proto__);
 console.log(A.__proto__ === Function.prototype); // true
+console.log(a.constructor === A)
+console.log(a.constructor === A.prototype.constructor)
 
-console.log('------------------------');
+console.log('------------------------1');
 
 
 // 2.对象字面量方式生成对象
 let b = {}
 console.log(b.__proto__)
+console.log(b.constructor === Object)
+console.log(b.constructor === Object.prototype.constructor)
 
 
-console.log('------------------------');
+console.log('------------------------2');
 
 
 // 3.Object.create() 方式生成对象
@@ -32,9 +36,11 @@ console.log(c2.__proto__ === c1); // true
 console.log(c2.__proto__ === c2.constructor.prototype); // false
 console.log(c2.__proto__ === c1.constructor); // false
 console.log(c2.__proto__ ); // {}
+console.log(c2.constructor === c1.constructor) // true
+console.log(c1.constructor === Object) // true
 
 
-console.log('------------------------');
+console.log('------------------------3');
 
 
 

@@ -1,4 +1,6 @@
 // 接 bind-this2-1, 以下内容是对该链接的记录，讲得超级好，层层递进：https://www.cnblogs.com/echolun/p/12178655.html
+// 关于 this 绑定的优先级：https://www.cnblogs.com/billyu/p/10063823.html
+
 
 // 总结：
 // bind 的4个特性：
@@ -65,6 +67,9 @@ bound(2); //4
 
 
 // 3.版本三：使用 new 调用和普通调用的区分，为了让 this 不丢失
+
+// 为啥要这么做：因为如果是用 new 调用这个绑定后的函数，是会丢失 obj 的绑定的（因为 new 时，内部会生成一个实例对象，并没有把绑定的那部分考虑进去https://www.cnblogs.com/echolun/p/10903290.html，
+// 所以绑定的会丢失），因此，为了模拟用 new 的情况，应该就返回 this, 也就是丢失了绑定的情况。只有直接调用时才会返回一个绑定了的实例。这也印证了 this 绑定优先级的问题， new 等级最高： https://www.cnblogs.com/billyu/p/10063823.html
 
 Function.prototype.bind_ = function (obj) {
     var fn = this;

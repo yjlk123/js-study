@@ -1,6 +1,22 @@
 // 1. new 的手动实现
+// https://www.cnblogs.com/echolun/p/10903290.html
 
-// 自己定义的 new 函数
+// 1.1 便于理解一个构造函数内部：
+// ES5构造函数
+let Parent = function (name, age) {
+    //1.创建一个新对象，赋予this，这一步是隐性的，
+    // let this = {};
+    //2.给this指向的对象赋予构造属性
+    this.name = name;
+    this.age = age;
+    //3.如果没有手动返回对象，则默认返回this指向的这个对象，也是隐性的
+    // return this;
+};
+const child = new Parent();
+
+
+
+// 1.2 手写 new 函数
 function myNew(parent, ...param) {
     let obj = Object.create(parent.prototype) // 这一步是为了继承构造函数原型上的属性和方法
     let result = parent.call(obj, ...param) // 这一步使用构造函数返回的对象赋值给新建的对象，这样就能让新建的对象拥有构造函数上的属性。所以这就是为啥构造函数里给 this 赋值的变量实例也会有，而直接定义的变量实例里是没有的，因为，调用构造函数的对象是 obj 呀！！！！马鸭，知识点串起来了，开心
