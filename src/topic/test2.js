@@ -163,3 +163,24 @@ function use(){
 }
 let ab = use.myBind(bindObj1)
 ab()
+
+
+// 10.小数点相加的精确方法
+function addCalc (num1, num2){
+    let r1 = 0, r2 = 0
+    try {
+        r1 = num1.toString.split('.')[1].length // 错误点，toString 的用法错误
+    } catch (error) {
+        r1 = 0
+    }
+    try {
+        r2 = num2.toString.split('.')[1].length // 错误点，toString 的用法错误
+    } catch (error) {
+        r2 = 0
+    }
+    let len = Math.pow(10, Math.max(r1, r2))
+    let sum = num1 * len + num2 * len
+    return sum/len
+}
+
+console.log(addCalc(0.1, 0.2));
