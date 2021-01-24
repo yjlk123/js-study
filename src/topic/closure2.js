@@ -106,6 +106,10 @@ alert(object.getNameFunc()());
 
 
 // 5.2练习2
+// 为啥这个 that 居然能保存 this 的值？因为调用 getNameFunc 这个函数的对象是 object, this 的隐式绑定了，所以在运行 getNameFunc 函数时 this 就是 object 了，
+// 至于为啥能保存下来，因为有个误解，一直以为是不同的作用域在修改同一个 this 变量，this 指向的是同一个地址，就以为 that 会跟着 this 的改变而改变，但事实上，
+// 各个作用域下的 this 并没有关联，是重新生成的一个变量，并没有修改其他作用域里的 this, 因为想修改也够不着嘛，根本不是同一个作用域了，找不到之前的 this 的值
+
 var name = "The Window";
 
 var object = {
