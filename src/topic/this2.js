@@ -167,6 +167,23 @@
 // fn.bind(obj3)(); 
 
 
+// // 6.1 显示绑定如果传入的是 undefined 或者 null, 非严格模式下指向 window, 而严格模式下指向的就是 undefined 或者 null, 访问变量就报错了
+// let obj1 = {
+//     name: '听风是风'
+// };
+// let obj2 = {
+//     name: '时间跳跃'
+// };
+// var name = '行星飞行';
+
+// function fn() {
+//     "use strict" // 注意这行去掉和不去掉的区别
+//     console.log(this.name);
+// };
+// fn.call(undefined); //行星飞行
+// fn.apply(null); //行星飞行
+// fn.bind(undefined)(); //行星飞行
+
 
 // // 7.new
 
