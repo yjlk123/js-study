@@ -16,15 +16,38 @@
             // obj1.o.func()
             // obj1.fn()
         }
+        function check() {
+            if (username.value == "") {
+                // spans[0].innerHTML = "<font color='red'>用户名不能为空</font>";
+                return false;
+            } else if (password.value == "") {
+                // spans[1].innerHTML = "<font color='red'>密码不能为空</font>";
+                return false;
+            } else if (rePassword.value == "") {
+                // spans[2].innerHTML = "<font color='red'>确认密码不能为空</font>";
+                return false;
+            }
+            return true;
+        }
     </script>
     <noscript>
         <p>您没有开启JavaScript</p>
     </noscript>
-    <script type="text/javascript" src="./algorithm/283.js"></script>
-    <!-- <script type="text/javascript" src="./topic/closure2.js"></script> -->
+    <!-- <script type="text/javascript" src="./algorithm/283.js"></script> -->
+    <script type="text/javascript" src="./topic/grammar.js"></script>
 
 <body onload="load()">
     <p>hello world!</p>
+    <span id="hello">aaaaaa</span>
+    <!-- https://www.jb51.net/article/69972.htm -->
+    <!-- https://eurecode.blog.csdn.net/article/details/89681632 -->
+    <!-- https://www.jb51.net/article/85038.htm -->
+    <!-- https://blog.csdn.net/a974986042/article/details/84900005 -->
+    <form action="https://www.baidu.com" method="get" onsubmit="return check()">
+        <input type="text" name="username" id="username" value="3" />
+        <input type="text" name="password" id="password" value="abc" />
+        <input type="submit" value="通过传递参数" />
+    </form>
 </body>
 
 </html>

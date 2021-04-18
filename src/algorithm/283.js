@@ -7,6 +7,7 @@
  */
 var moveZeroes = function (nums) {
   let zeroArr = []
+  debugger
   nums.forEach((item, index) => {
     if (item === 0) {
       zeroArr.push(index)
