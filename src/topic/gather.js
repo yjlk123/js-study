@@ -1,0 +1,25 @@
+// 实现数组的取交集，并集，差集
+
+let arr1 = [1, 2, 3]
+let arr2 = [2, 3, 5, 6]
+
+// 1.实现数组的交集
+let intersection = function (arr1, arr2) {
+  return arr1.filter(item => {
+    return arr2.includes(item)
+  })
+}
+
+
+console.log(intersection(arr1, arr2));
+
+
+// 2.实现数组的并集
+let union = function (arr1, arr2) {
+  let unionResult = [].concat(arr1).concat(arr2) // concat 居然可以链式调用诶，神奇！
+  unionResult = [...new Set(unionResult)] // 注意：如果不使用扩展函数的话，结果是个 Set 对象而不是数组
+  return unionResult
+}
+
+console.log(union(arr1, arr2));
+
