@@ -27,12 +27,12 @@ bar.call2(foo); // 1
 Function.prototype.call2 = function(context) {
     context.fn = this;
     var args = [];
-    for(var i = 1, len = arguments.length; i < len; i++) { // arguments 是个类数组，有迭代器，但不是真正的数组. 注意参数从第二个开始取，第一个只作为 this
+    for(var i = 1, len = arguments.length; i < len; i++) { // arguments 是个类数组，有迭代器，但不是真正的数组. 注意参数从第二个开始取，第一个参数只作为 this
         args.push('arguments[' + i + ']'); // 不能用 Array.prototype.slice.call 因为这里就是要实现 call
     }
     console.log('参数：', args); // ["arguments[1]", "arguments[2]"]
     // eval('context.fn(' + args +')');
-    // context.fn(args) // 这样是无法正确调用的，必须按上面的方式写
+    // context.fn(args) // 这样是无法正确调用的，必须按上面的方式写，因为 arguments 存在 args 里只是字符串，只有 eval 是才会执行获取参数
     delete context.fn;
 }
 
