@@ -31,8 +31,11 @@ Function.prototype.call2 = function(context) {
         args.push('arguments[' + i + ']'); // 不能用 Array.prototype.slice.call 因为这里就是要实现 call
     }
     console.log('参数：', args); // ["arguments[1]", "arguments[2]"]
-    // eval('context.fn(' + args +')');
-    // context.fn(args) // 这样是无法正确调用的，必须按上面的方式写，因为 arguments 存在 args 里只是字符串，只有 eval 是才会执行获取参数
+    eval('context.fn(' + args +')'); // context.fn(args)这样是无法正确调用的，必须按左侧这种的方式写，因为 arguments 存在 args 里只是字符串，只有 eval 是才会执行获取参数
+
+    // 另一种调用方式,不用 eval
+    // args = Array.from(arguments).slice(1)
+    // context.fn(...args) // 必须用扩展开再调用，否则传进去的就变成一个参数了
     delete context.fn;
 }
 
@@ -42,9 +45,9 @@ var foo = {
 };
 
 function bar(name, age) {
-    console.log(name)
-    console.log(age)
-    console.log(this.value);
+    console.log('name:', name)
+    console.log('age:', age)
+    console.log('value:', this.value);
 }
 
 bar.call2(foo, 'kevin', 18); 
@@ -62,7 +65,7 @@ Function.prototype.call2 = function (context) {
     context.fn = this;
 
     var args = [];
-    for(var i = 1, len = arguments.length; i < len; i++) {
+    for(var i = 1, len = arguments.length; i < len; i++) { // 有点神奇，注意这里，函数声明只有一个参数，但是可以通过 arguments 拿到后面的参数
         args.push('arguments[' + i + ']');
     }
 
