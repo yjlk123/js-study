@@ -31,7 +31,7 @@ Function.prototype.call2 = function(context) {
         args.push('arguments[' + i + ']'); // 不能用 Array.prototype.slice.call 因为这里就是要实现 call
     }
     console.log('参数：', args); // ["arguments[1]", "arguments[2]"]
-    eval('context.fn(' + args +')'); // context.fn(args)这样是无法正确调用的，必须按左侧这种的方式写，因为 arguments 存在 args 里只是字符串，只有 eval 是才会执行获取参数
+    eval('context.fn(' + args +')'); // context.fn(args)这样是无法正确调用的，必须按左侧这种的方式写，因为 arguments 存在 args 里只是字符串，只有 eval 时才会执行获取参数
                                      // 注意这里传进去的虽然是个数组，但是因为 eval 的特殊性，eval函数在执行的时候会默认识别字符串里的数组元素，逐个传递参数 ，好比在这里执行了es6的展开操作符 ...
     // 另一种调用方式,不用 eval
     // args = Array.from(arguments).slice(1)
