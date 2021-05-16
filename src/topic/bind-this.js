@@ -1,15 +1,15 @@
 // bind 和 this 息息相关
 
 
-// // 1.bind
-// const obj = {}
-// function test(){
-//     console.log(this === obj)
-// }
-// const testObj = test.bind(obj)
+// 1.bind
+const obj = {}
+function test(){
+    console.log(this === obj)
+}
+const testObj = test.bind(obj)
 
-// test() // false 注意: bind 是生成一个全新的函数，原来的函数不受影响
-// testObj() // true
+test() // false 注意: bind 是生成一个全新的函数，原来的函数不受影响
+testObj() // true
 
 
 
@@ -22,7 +22,7 @@ function test(){
 }
 
 // 自定义的函数，模拟 bind 对 this 的影响；
-// 注意区别，自己写的方法是将对象和目标都作为参数了，而原生的 bind 是作为了一个函数的属性方法存在的
+// 注意区别，自己写的方法是将对象和目标都作为参数了，而原生的 bind 是作为了一个函数的属性方法存在的. 当然也可以写成原生的方式，也就是在原型上加方法，见 bind-this2-2.js
 function myBind(func, target){
     return function(){ // 一个闭包
         return func.apply(target, arguments) // arguments ? 哪来的？

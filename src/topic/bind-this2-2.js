@@ -5,19 +5,20 @@
 // 总结：
 // bind 的4个特性：
 // 1.可以修改函数 this 的指向, 返回一个绑定了 this 的新函数
-// 2.支持函数柯里化
+// 2.支持函数柯里化。在绑定时传入的第一个参数作为 this, 而其余参数将作为新函数的参数，供调用时使用，也就是内部会保存绑定时的参数，和后续真正调用函数时的参数一起
 // 3.this 无法再次被修改，使用 call 、 apply 也不行
 // 4.其中要注意用 new 方式调用函数这种方式，会忽略已经确定的 this,但返回的实例还是会继承构造函数的构造器属性与原型属性，并且能正常接收参数。但如果是用普通调用的
-// 方式进行调用的话，又能正确绑定到 this， 所以会感觉有点混乱
+// 方式进行调用的话，又能正确绑定到 this，原来用 bind 绑定的 this 会丢失，所以会感觉有点混乱
 
 
-
+// 注意：每个版本测试时需要注释掉其他的版本
 
 // 1.版本一：能够返回一个绑定了 this 的新函数
 
 Function.prototype.bind_ = function (obj) {
     var fn = this; // 这里的 this, 其实就是 fn ,因为调用 bind_ 这个函数时，是 fn 调用的， 因为 this 的定义就是指向调用它的那个人，所以这时候 this 是 fn, 就是将 fn 保存下来了。如果不提前保存，在执行bound时内部this会指向window。
     return function () {
+        debugger
         fn.apply(obj);
     };
 };
@@ -41,13 +42,14 @@ bound(); //1
 
 Function.prototype.bind_ = function (obj) {
     var fn = this;
-    let args = [].slice.apply(arguments, 1) // 注意这里用的是 call, 而不是 apply, 是因为 arguments 是类数组，不是真正的数组吗？但问题在于 call 不是要一个个参数调用吗？这样不是一个个参数的形式啊???
+    let args = [].slice.call(arguments, 1) // 注意这里用的是 call, 而不是 apply, 是因为 arguments 是类数组，不是真正的数组吗？但问题在于 call 不是要一个个参数调用吗？这样不是一个个参数的形式啊???
                                                 // 答：问这个问题是因为对 apply 和 call 的用法不熟悉的原因，用法：Function.apply(obj,args)， 第一个参数根本就
                                                 // 不是参数，当然不涉及数组还是单个参数的问题，第一个参数是为了绑定 this 值的啊，这都忘了，服了！所以我猜用 call 还是 apply 都一样的，因为只有一个参数 1， 所以直接用 call 更方便呀
 
     return function () {
         let params = [].slice.apply(arguments)
-        fn.apply(obj, args.concat.apply(params)); // 注意这里用的是 call, 而不是 apply,
+        let par = args.concat(params)
+        fn.apply(obj, par); // 注意这里用的是 apply, 而不是 call
     };
 };
 var obj = {
@@ -73,11 +75,11 @@ bound(2); //4
 
 Function.prototype.bind_ = function (obj) {
     var fn = this;
-    let args = [].slice.apply(arguments, 1)
+    let args = [].slice.call(arguments, 1)
     let bound = function () { // 注意这里需要将函数指定给一个变量，后面给这个变量改变原型后才能返回。这里和版本二不一样
-        let params = [].slice.apply(arguments)
+        let params = [].slice.call(arguments)
         // 通过 constructor 判断调用方式，为 true, this 指向实例，否则为 obj
-        fn.apply(this.constructor === fn ? this : obj, args.concat.apply(params));
+        fn.call(this.constructor === fn ? this : obj, args.concat.apply(params));
     };
     // 原型链继承
     bound.prototype = fn.prototype // 注意这里还要将函数的原型指向 fn 的原型，因为 bind 函数的特性4就是这一条，不能丢失
