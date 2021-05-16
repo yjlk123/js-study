@@ -98,7 +98,7 @@ Function.prototype.bind_ = function (obj) {
 
 Function.prototype.bind_ = function (obj) {
     var fn = this;
-    let args = [].slice.apply(arguments, 1)
+    let args = [].slice.call(arguments, 1)
     let bound = function () {
         let params = [].slice.apply(arguments)
         fn.apply(this.constructor === fn ? this : obj, args.concat.apply(params));
