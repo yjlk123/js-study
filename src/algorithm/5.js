@@ -1,4 +1,4 @@
-// 5.最长回文子串
+// leecode 5.最长回文子串
 // 方法1 中心扩展 不准确
 let long = function (s) {
   let left = 0, center = 0, right = 0, lenLeft = 0, lenRight = 0, lenBoth = 0, maxLen = 0, maxLeft = 0, maxRight = 0

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>双飞翼布局</title>
+  <style type="text/css">
+    body {
+      min-width: 550px;
+    }
+
+    .col {
+      float: left;
+    }
+
+    #main {
+      width: 100%;
+      height: 200px;
+      background-color: #ccc;
+    }
+
+    #main-wrap {
+      margin: 0 190px;
+      /*这是圣杯和双飞翼最明显的区别，在main内部使用的是margin，而圣杯是直接在container部分使用padding*/
+    }
+
+    #left,
+    #right {
+      width: 190px;
+      height: 200px;
+      background-color: #0000FF;
+    }
+
+    #left {
+      /* margin 的百分比是相对于父元素的宽度， 如果把 main 宽度改成 80% 可见 left 会向左移动 */
+      margin-left: -100%;
+    }
+
+    #right {
+      /* 刚好是 main-wrap 的 margin 宽度 */
+      margin-left: -190px;
+      background-color: #FF0000;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="text/javascript" src="./test.js"></script>
+  <!-- 目的：为了优先显示中间主要部分，浏览器渲染引擎在构建和渲染渲染树是异步的（谁先构建好谁先显示），故在编写时，先构建中间main部分，但由于布局原因，将left置于center左边，故而出现了双飞翼布局。 -->
+
+  <div id="box">
+    <div id="container">
+      <div id="main" class="col">
+        <div id="main-wrap"> #main </div>
+      </div>
+      <div id="left" class="col">#left</div>
+      <div id="right" class="col">#right</div>
+      
+      <!-- 原文链接：https://blog.csdn.net/a18792627168/article/details/79686746 -->
+    </div>
+</body>
+
+</html>
+

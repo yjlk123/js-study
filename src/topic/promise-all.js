@@ -13,7 +13,7 @@ Promise.myall = function (arr) {
             for (let i = 0; i < arr.length; i++) {
                 // 同时也能处理arr数组中非Promise对象
                 if (!(arr[i] instanceof Promise)) {
-                    res[i] = arr[i]
+                    res[i] = arr[i] // 这里说明 Promise.all 是按传入数组的顺序将结果返回的
                     if (++count === arr.length) // 如果是用这个来做判断条件的话: result.length === arr.length 这样写有个错误的问题，如果最后一项不是最后一个完成的，那么就有空的项
                         resolve(res)
                 } else {

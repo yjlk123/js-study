@@ -1,4 +1,4 @@
-// // 1. promise 用法
+// 1. promise 用法
 
 // // （1）原始的回调函数方式
 // function loadImg (src, callback, fail) {
@@ -22,9 +22,9 @@
 
 
 // // （2）使用 promise 的方式
-// // then 中有2个参数，第一个是状态变成成功后应该执行的回调函数，第二个参数是状态变成失败后应该执行的回调函数.注意是一个函数里的两个参数，
+// // then 平时只用了一个参数，就是成功时的回调函数，但其实 then 中有2个参数，第一个是状态变成成功后应该执行的回调函数，第二个参数是状态变成失败后应该执行的回调函数.注意是一个函数里的两个参数，
 // // 失败时的函数是在第二个参数里，而不是在 .catch 里捕获的,这2个参数也不需要从 loadImg 传进去，直接就在 Promise 的构造函数的参数里，
-// // 由最后调用这个 promise 的时候传进去实参, 也就是 Promise 的 then 方法里传入的函数，见下面 2.
+// // 由最后调用这个 promise 的时候传进去实参, 也就是 Promise 的 then 方法里传入的函数（下面的 A 处），见下面 2.
 
 // function loadImg (src) {
 //     let promise = new Promise((resolve, reject) => {
@@ -41,8 +41,12 @@
 // }
 
 // 调用:
-// loadImg.then(res => {
+// 自己理解的 Promis 的用法： Promise是个构造函数，它有1个参数, 用于用户传入一个异步函数，这个异步函数有2个参数，一个 resolve, 一个 reject，这2个参数都是 Promise 内部提供的颞部函数，给用户在异步有结果时调用的。
+// then 是 Promise 的一个属性，它也有2个参数，都是函数，分别是成功时的回调函数，失败时的回调函数。在这2个回调函数里，用户会调用 resolve, reject。也就是说，resolve 和 reject, 用户可用在2个地方调用，在 Promis 的构造函数里调用，在 then 的回调函数里调用
+// loadImg.then(res => { // A
 
+// }, err => {
+//   reject(err)
 // })
 
 
@@ -70,7 +74,7 @@
 //         console.log(res); // 1000ms后输出1
 //         return Promise.resolve(res); // 显式的return一个Promise对象
 //     }).then(p2).then(function (res) {
-//         console.log(res); // 再过3000ms后输出2,3
+//         console.log(res); // 再过3000ms后输出2,3  注意 p2 里虽然也有宏任务，但是排在 最后一个 then 宏任务之前，说明 then 的链式操作是按顺序一个一个解析的，并不是一开始就都放进宏任务里的
 //     });
 // }
 
@@ -93,55 +97,59 @@
 
 
 // // 2.3 如果是传入一个 Promise 对象呢，直接返回，这个过程是语法糖，这题涉及到 Promise 的循环调用
-// // // 直接调用 resolve:
-// // Let p1 = Promise.resolve('abc')
-// // // 等价于： 也就是 Promise.resolve() 是下面这个写法的语法糖：
-// // let p2 = new Promise((resolve, reject) => {
-// //   resolve('abc');
-// // })
+// // 直接调用 resolve:
+// let p1 = Promise.resolve('abc')
+// // 等价于： 也就是 Promise.resolve() 是下面这个写法的语法糖：
+// let p2 = new Promise((resolve, reject) => {
+//   resolve('abc');
+// })
 
-// let p = new Promise((resolve,reject) => {
-//     setTimeout(() => {
-//         resolve('success');
-//     },500);
+// let p = new Promise((resolve, reject) => {
+//   setTimeout(() => {
+//     resolve('success');
+//   }, 500);
 // });
-// let pp = Promise.resolve(p);
+// // let pp = Promise.resolve(p);
+// let pp = new Promise((resolve, reject) => {
+//   resolve(p);
+// })
 // console.log(pp); // A 注意这里：因为 pp 依赖于进入宏任务队列的结果，所以主线程中虽然执行 pp 了，但是它的结果显示 Promise 处于 pending 状态。对比 B 处
+// console.log(p)
 
 // pp.then(result => {
-//     console.log(result);
-//     console.log(pp) // 对比 A
+//   console.log(result);
+//   console.log(pp) // B 对比 A
 // });
 // console.log(pp == p);
 
 
 
-// 2.4.1 Promise 的错误捕获
-// (1)异步代码的运行时错误无法被自动 reject 进而被 catch 捕获，而是直接报错 ?????????
-let p3 = new Promise((resolve, reject) => {
-    setTimeout(() => {
-      throw "error";
-    }, 0);
-  });
-  
-  p3.catch(err => {
-    console.log("catch " + err); // 不会被执行
-  });
-  
+// // 2.4.1 Promise 的错误捕获
+// // (1)异步代码的运行时错误无法被自动 reject 进而被 catch 捕获，而是直接报错 ?????????
+// let p3 = new Promise((resolve, reject) => {
+//     setTimeout(() => {
+//       throw "error";
+//     }, 0);
+//   });
 
-// (2)但是若异步操作抛出错误的回调是在 Promise 的 catch 之前执行的，其实还是可以被 catch 所捕获到的，比如 Promise 的 then 方法所抛出的错误：
-let p = Promise.resolve();
-let p1 = new Promise(function (resolve, reject) {
-  p.then(()=>{ 
-    throw 123;
-  }).catch(e => {
-    reject(e);
-  });
-});
+//   p3.catch(err => {
+//     console.log("catch " + err); // 不会被执行
+//   });
 
-p1.catch(err => {
-  console.log(err); // 123，错误成功被捕获
-});
+
+// // (2)但是若异步操作抛出错误的回调是在 Promise 的 catch 之前执行的，其实还是可以被 catch 所捕获到的，比如 Promise 的 then 方法所抛出的错误：
+// let p = Promise.resolve();
+// let p1 = new Promise(function (resolve, reject) {
+//   p.then(()=>{ 
+//     throw 123;
+//   }).catch(e => {
+//     reject(e);
+//   });
+// });
+
+// p1.catch(err => {
+//   console.log(err); // 123，错误成功被捕获
+// });
 
 
 
@@ -154,45 +162,48 @@ p1.catch(err => {
 
 
 
-// 4.手动实现 promise
-// 4.1 基本的功能
-// 总结理解，如何记忆： Promise 的内部结构要从下往上理解，最终做的操作是执行传进去的异步函数 fn, 这个 fn 的参数就是 resolve 函数; 
-// resolve 函数里做的操作是传进异步函数的结果来执行回调函数，不过这个回调函数是在 then 里面保存到本地变量了的， resolve 里还会保存异步操作的结果到本地变量.
-// 可以这么说，其实主要承上启下的是 resolve 这个 Promise 的内部函数，往上延伸，往下扩展都围绕着它来就好记了。
-// 关键点： 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数
-function Promise (fn) {
-    let value = null; // 异步函数执行后的结果
-    let deferred; // 异步函数执行后，真正要执行的回调函数，保存到本地变量
-    this.then = function (onFulfilled) { // Promise 的 then 方法用于注册回调函数，即赋值给内部的 deferred
-        deferred = onFulfilled;
-    }
-    function resolve (newValue) { // 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数
-        value = newValue;
-        deferred(value);
-    }
-    fn(resolve); // 创建 Promise 实例的参数是 fn, 并将其内部的 resolve 方法作为参数传递给异步函数
-}
-
-
-
-
-
-// // 4.2 改进1
-// // 目前的代码只能注册一个回调方法，这显然不符合我们的预期，所以将内部的deferred修改为deferreds数组，相应的执行resolve时，也要遍历deferreds数组依次执行：
+// // 4.手动实现 promise
+// // 4.1 基本的功能
+// // 总结理解，如何记忆： Promise 的内部结构要从下往上理解，最终做的操作是执行构造函数 Promise 传进去的函数 fn, 这个 fn 的参数就是 resolve 函数; 
+// // Promiese 这个构造函数的参数是个函数，这个函数有2个参数：resolve 和 reject 
+// // resolve 函数里做的操作是传进异步函数的结果来执行回调函数，不过这个回调函数是在 then 里面保存到本地变量了的， resolve 里还会保存异步操作的结果到本地变量.
+// // 可以这么说，其实主要承上启下的是 resolve 这个 Promise 的内部函数，往上延伸，往下扩展都围绕着它来就好记了。
+// // 关键点： 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数
 // function Promise (fn) {
-//     let value = null;
-//     let deferreds = [];
-//     this.then = function (onFulfilled) {
-//         deferreds.push(onFulfilled);
-//     }
-//     function resolve (newValue) {
-//         value = newValue;
-//         deferreds.forEach((deferred) => {
-//             deferred(value);
-//         });
-//     }
-//     fn(resolve);
+//   let value = null; // 异步函数执行后的结果
+//   let deferred; // 异步函数执行后，真正要执行的回调函数，保存到本地变量
+//   this.then = function (onFulfilled) { // Promise 的 then 方法用于注册回调函数，即赋值给内部的 deferred
+//     deferred = onFulfilled;
+//   }
+//   function resolve (newValue) { // 当异步函数回调成功后，会将结果作为参数来执行 resolve, 而实际上是执行 deferred 函数。
+//     value = newValue;
+//     deferred(value);
+//   }
+//   fn(resolve); // 创建 Promise 实例的参数是 fn, 并将其内部的 resolve 方法作为参数传递给异步函数.注意 异步函数指的是构造函数的参数，而不是 then 的参数，then 只是 Promise 的一个属性
+//   // 为啥这里要传入 resolve,而且 resolve 是 Promise 内部的一个函数，就是为了给用户提供的，用户自己会在异步函数里调用 resolve, 并且 resolve 的参数也是由用户传进去的。
+//   // 异步就在于封装好的 Promis 无法像同步那样完全内部处理完，要暴露出一个函数让用户调用，用户有结果了自己调用, 和 Promise 内部的操作分开不同步，依赖于异步的结果，所以叫做异步吧。
 // }
+
+
+
+
+
+// 4.2 改进1
+// 目前的代码只能注册一个回调方法，这显然不符合我们的预期，所以将内部的deferred修改为deferreds数组，相应的执行resolve时，也要遍历deferreds数组依次执行：
+function Promise (fn) {
+    let value = null;
+    let deferreds = [];
+    this.then = function (onFulfilled) {
+        deferreds.push(onFulfilled);
+    }
+    function resolve (newValue) {
+        value = newValue;
+        deferreds.forEach((deferred) => {
+            deferred(value);
+        });
+    }
+    fn(resolve);
+}
 
 
 

@@ -1,7 +1,7 @@
 // apply 的实现
 // apply 的实现跟 call 类似，在这里直接给代码，参考: ./call.js
 
-Function.prototype.apply1 = function (context, arr) {
+Function.prototype.apply2 = function (context, arr) {
     // 如果 context 存在，使用 context，如果 context 不存在，使用 window；如果 context 是普通类型，转成对象。
     var context = Object(context) || window;
     context.fn = this;
