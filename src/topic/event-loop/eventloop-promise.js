@@ -6,35 +6,40 @@
 // 1.promise 的 new 操作和 then 的执行都是同步操作，但是 then 里的回调函数是异步的。关于啥时候将回调推入微任务队列是有讲究的：
 // (1)当执行 then 方法时，如果前面的 promise 已经是 resolved 状态，则会立即将回调推入微任务队列（但是执行回调还是要等到所有同步任务都结束后）, 如果前面的 promise 是 pending 状态则会将回调存储在 promise 的内部，一直等到 promise 被 resolve 才将回调推入微任务队列
 // (2)当一个 promise 被 resolve 时，会遍历之前通过 then 给这个 promise 注册的所有回调，将它们依次放入微任务队列中
+// (3)注意链式调用后一个 then 必须要等前一个 then resolve 后才会放入微任务队列里
 // 2.resolve 的作用除了将当前的 promise 由 pending 变为 resolved，还会遍历之前通过 then 给这个 promise 注册的所有回调，将它们依次放入微任务队列中，很多人以为是由 then 方法来触发它保存回调，而事实上是由 promise 的 resolve 来触发的，then 方法只负责注册回调
 
 
-// // 1.promise 的链式调用的 eventloop (1)
-// // https://www.jianshu.com/p/aa3d8b3adde3 讲得很好，简单易懂
-// function p1 () {
-//     return new Promise((resolve, reject) => {
-//         console.log("log: 外部promise");
-//         resolve();
-//     })
-//         .then(() => {
-//             console.log("log: 外部第一个then");
-//             new Promise((resolve, reject) => {
-//                 console.log("log: 内部promise");
-//                 resolve();
-//             })
-//                 .then(() => {
-//                     console.log("log: 内部第一个then");
-//                 })
-//                 .then(() => {
-//                     console.log("log: 内部第二个then");
-//                 });
-//         })
-//         .then(() => {
-//             console.log("log: 外部第二个then");
-//         });
-// }
-// p1()
+// 1.promise 的链式调用的 eventloop (1)
+// https://www.jianshu.com/p/aa3d8b3adde3 讲得很好，简单易懂
+function p1 () {
+    return new Promise((resolve, reject) => {
+        console.log("log: 外部promise");
+        resolve();
+    })
+        .then(() => { // A
+            console.log("log: 外部第一个then");
+            new Promise((resolve, reject) => {
+                console.log("log: 内部promise");
+                resolve();
+            })
+                .then(() => { // C
+                    console.log("log: 内部第一个then");
+                })
+                .then(() => { // D
+                    console.log("log: 内部第二个then");
+                });
+        })
+        .then(() => { // B
+            console.log("log: 外部第二个then");
+        });
+}
+p1()
 
+// 微任务   A
+// 宏任务
+
+// log: 外部promise,log: 外部第一个then,log: 内部promise, log: 内部第一个then, log: 内部第二个then, log: 外部第二个then, 
 
 
 // // 2. 链式调用的 eventloop (2)

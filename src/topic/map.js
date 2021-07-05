@@ -1,11 +1,14 @@
 // map 
 // https://www.cnblogs.com/xiaoliziaaa/p/13334895.html
+// https://es6.ruanyifeng.com/#docs/set-map
 
 // 1.初始化map的三种方式 
 // 注意 map 对象打印的结果，形式很特别
-// Map 对象保存键值对，并且能够记住键的原始插入顺序。任何值(对象或者原始值) 都可以作为一个键或一个值。 
+// Map 对象保存键值对，并且能够记住键的原始插入顺序。任何值(对象或者原始值) 都可以作为一个键或一个值,对比对象只能是字符串作为键名。 
 // map对象常用于保存键值对，它的键是任意数据类型，常用于建立数据的映射关系
 // 和对象的区别：Object对象的key只能是字符串或者Symbol，map的key可是是任意数据类型;Map的key是有序的；map的键值对个数通过size属性获取，对象只能自己统计
+// 注意：Map 和 Set 都可以转换成数组，都通过 ... 扩展符或者 Array.from // https://es6.ruanyifeng.com/#docs/set-map
+
 
 // 1.
 const map1 = new Map()
@@ -83,6 +86,53 @@ const map1 = new Map()
   console.log(map1.size); //2
   console.log(map1.delete('80')); //false 删除不存在的key 原map不改变，返回值false
   console.log(map1.size); //2
+
+
+
+
+
+
+// Map 转换为数组结构 https://es6.ruanyifeng.com/#docs/set-map
+
+const map = new Map([
+  [1, 'one'],
+  [2, 'two'],
+  [3, 'three'],
+]);
+
+[...map.keys()]
+// [1, 2, 3]
+
+[...map.values()]
+// ['one', 'two', 'three']
+
+[...map.entries()]
+// [[1,'one'], [2, 'two'], [3, 'three']]
+
+[...map]
+// [[1,'one'], [2, 'two'], [3, 'three']]
+
+
+
+// Map 居然可以链式调用 set 方法，因为 set 方法返回的是自己本身
+
+
+// forEach方法还可以接受第二个参数，用来绑定this。
+// https://es6.ruanyifeng.com/#docs/set-map
+
+
+const reporter = {
+  report: function(key, value) {
+    console.log("Key: %s, Value: %s", key, value);
+  }
+};
+
+map.forEach(function(value, key, map) {
+  this.report(key, value);
+}, reporter)
+
+
+
 
 
 

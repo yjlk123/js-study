@@ -5,6 +5,9 @@
 let unique1 = arr => [...new Set(arr)] // new 出来的是一个 Set 对象，因为把这个对象一一展开了，又放进数组里了，所以变成了数组
 console.log(unique1([1, 2, 3, 4, 5, 2, 5]));
 
+const items = new Set([1, 2, 3, 4, 2, 3, 5]);
+const array = Array.from(items)
+
 // 2.filter
 let unique2 = function (arr) {
     let result = arr.filter((item, index, arr) => {
