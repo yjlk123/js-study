@@ -11,6 +11,8 @@ function fn1 () {
 async function asyncCall () {
     var result = await fn1();
     console.log(result);
+    console.log('haha');
 }
 console.log('先运行，async 不会阻塞后面的代码，await 会阻塞，所以叫同步方式实现异步');
 asyncCall();
+console.log('async 不会阻塞后面的代码');

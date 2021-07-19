@@ -1,8 +1,9 @@
+// 应该先看 一般的事件循环，再看 Promise 链式调用的事件循环，再看这个文件
 // 下列代码执行顺序
 
 async function async1() { // A
   console.log('async1 start');
-  await async2();
+  await async2(); // await 会阻塞它后面的代码，相当于 Promise 的 then 里的回调，但是 async 不会阻塞后面的其他语句
   console.log('async1 end'); // F
 }
 
@@ -27,7 +28,10 @@ new Promise(function(resolve) { // D
 
 console.log('script end');
 
-// 微任务 
-// 宏任务 C F E
+// script start, async1 start, async2, promise1, script end, async1 end, promise2, setTimeout
 
-// script start, async1 start, async2, promise1, script end, setTimeout, async1 end, promise2
+// 主线程 
+// 注册：
+// 微任务 
+// 宏任务
+

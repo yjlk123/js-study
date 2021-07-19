@@ -13,9 +13,9 @@ let doSth = function (){
     console.log('222');
 }
 async function sleep (fn, time){
-    await mySleep(fn, time)
+    let waitResult = await mySleep(fn, time)
 }
 
 console.log('111');
 sleep(doSth, 1000)
-console.log('333');
+console.log('333'); // 333 会在 222 之前运行，所以这个 sleep 函数的意思是让传进去的函数一段时间后执行
