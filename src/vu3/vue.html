@@ -1,0 +1,159 @@
+<!-- vue 双向绑定实现 -->
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>双向绑定</title>
+</head>
+
+<body>
+    <!-- 实现vue -->
+    <div id="app">
+        <input type="text" v-model="text">
+        {{ text }}
+    </div>
+    <!-- 
+每当 new 一个 Vue，主要做了两件事：第一个是监听数据：observe(data)，第二个是编译 HTML：nodeToFragement(id)。
+在监听数据的过程中，我们会为 data 中的每一个属性生成一个主题对象 dep。
+
+在编译 HTML 的过程中，会为每个与数据绑定相关的节点生成一个订阅者 watcher，watcher 会将自己添加到相应属性的 dep 容器中。
+
+我们已经实现：修改输入框内容 => 在事件回调函数中修改属性值 => 触发属性的 set 方法。
+
+接下来我们要实现的是：发出通知 dep.notify() => 触发订阅者的 update 方法 => 更新视图。
+这里的关键逻辑是：如何将 watcher 添加到关联属性的 dep 中。
+————————————————
+版权声明：本文为CSDN博主「wuxy720」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/wuxy720/article/details/80151610 -->
+
+    <script type="text/javascript">
+        function defineReactive(obj, key, val) {
+            var dep = new Dep();
+            Object.defineProperty(obj, key, {
+                get: function () {
+                    if (Dep.target) {
+                        dep.addSub(Dep.target);
+                    }
+                    return val
+                },
+                set: function (newVal) {
+                    if (newVal === val) {
+                        return
+                    }
+                    val = newVal;
+                    console.log('新值：' + val);
+                    // 一旦更新立马通知
+                    dep.notify();
+                }
+            })
+        }
+
+        /*观察者函数
+        * 对于一个实例 每一个属性值都进行观察
+        */
+        function observe(obj, vm) {
+            for (let key of Object.keys(obj)) {
+                defineReactive(vm, key, obj[key]);
+            }
+        }
+
+
+        function nodeToFragment(node, vm) {
+            var fragment = document.createDocumentFragment();
+            var child;
+            while (child = node.firstChild) {
+                compile(child, vm);
+                fragment.appendChild(child);
+            }
+            return fragment
+        }
+
+
+        /*编译函数*/
+        function compile(node, vm) {
+            var reg = /\{\{(.*)\}\}/; // 来匹配 {{ xxx }} 中的xxx
+            // 如果是元素节点
+            if (node.nodeType === 1) {
+                var attr = node.attributes;
+                // 解析元素节点的所有属性
+                for (let i = 0; i < attr.length; i++) {
+                    if (attr[i].nodeName == 'v-model') {
+                        var name = attr[i].nodeValue; // 看看是与哪一个数据相关
+                        node.addEventListener('input', function (e) {
+                            vm[name] = e.target.value; // 将实例的text 修改为最新值
+                        });
+                        node.value = vm[name]; // 将data的值赋给该node
+                        node.removeAttribute('v-model');
+                    }
+                };
+            }
+            // 如果是文本节点
+            if (node.nodeType === 3) {
+                if (reg.test(node.nodeValue)) {
+                    var name = RegExp.$1; // 获取到匹配的字符串
+                    name = name.trim();
+                    // node.nodeValue = vm[name];  // 将data的值赋给该node
+
+                    new Watcher(vm, node, name); // 不直接通过赋值的操作，而是通过绑定一个订阅者
+                }
+            }
+        }
+
+        /*Watcher构造函数*/
+        function Watcher(vm, node, name) {
+            Dep.target = this; // Dep.target 是一个全局变量
+            this.vm = vm;
+            this.node = node;
+            this.name = name;
+            this.update();
+            Dep.target = null;
+        }
+        Watcher.prototype = {
+            update() {
+                this.get();
+                this.node.nodeValue = this.value; // 注意，这是更改节点内容的关键
+            },
+            get() {
+                this.value = this.vm[this.name]; // 触发相应的get
+            }
+        }
+
+        /*dep构造函数*/
+        function Dep() {
+            this.subs = [];
+        }
+        Dep.prototype = {
+            addSub(sub) {
+                this.subs.push(sub);
+            },
+            notify() {
+                this.subs.forEach(function (sub) {
+                    sub.update();
+                })
+            }
+        }
+
+        /*Vue构造函数*/
+        function Vue(options) {
+            this.data = options.data;
+            var data = this.data;
+
+            observe(data, this);
+
+            var id = options.el;
+            var dom = nodeToFragment(document.getElementById(id), this);
+            // 处理完所有dom节点后,重新将内容添加回去
+            document.getElementById(id).appendChild(dom);
+        }
+
+        var vm = new Vue({
+            el: 'app',
+            data: {
+                text: 'hello world'
+            }
+        });
+
+    </script>
+</body>
+
+</html>

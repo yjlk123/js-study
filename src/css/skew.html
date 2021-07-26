@@ -1,0 +1,38 @@
+<!Doctype html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=gbk2312" />
+  <title>css 实现一个平行四边形</title>
+  <style type="text/css">
+    .box {
+      width: 120px;
+    }
+
+    .skew {
+      width: 118px;
+      height: 34px;
+      background: #4effe1;
+      margin: 0 auto;
+      color: #000;
+      font-size: 17px;
+      line-height: 34px;
+      text-align: center;
+      transform: skew(-15deg);
+    }
+
+    .skew-main {
+      transform: skew(15deg);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 原文链接：https://blog.csdn.net/qq_24147051/article/details/88861422 -->
+  <div class="box">
+    <div class="skew">
+      <!-- 注意父节点扭转了之后子组件也会随之扭转，因此想要正过来需要相反方向扭转一下 -->
+      <div class="skew-main">退出</div>
+    </div>
+  </div>
+</body>
+</html>
