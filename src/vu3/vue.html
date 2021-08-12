@@ -22,6 +22,8 @@
 
 接下来我们要实现的是：发出通知 dep.notify() => 触发订阅者的 update 方法 => 更新视图。
 这里的关键逻辑是：如何将 watcher 添加到关联属性的 dep 中。
+
+记忆逻辑：先实现 view => model, 再实现 model => view (这时是1对多)
 ————————————————
 版权声明：本文为CSDN博主「wuxy720」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 原文链接：https://blog.csdn.net/wuxy720/article/details/80151610 -->
@@ -30,9 +32,9 @@
         function defineReactive(obj, key, val) {
             var dep = new Dep();
             Object.defineProperty(obj, key, {
-                get: function () {
+                get: function () { // 在 Watcher.prototype 里触发了 get
                     if (Dep.target) {
-                        dep.addSub(Dep.target);
+                        dep.addSub(Dep.target); // get 是添加订阅
                     }
                     return val
                 },
@@ -42,7 +44,7 @@
                     }
                     val = newVal;
                     console.log('新值：' + val);
-                    // 一旦更新立马通知
+                    // 一旦更新立马通知，即有变化才会通知那些监听的家伙们，就是发布
                     dep.notify();
                 }
             })
@@ -58,10 +60,13 @@
         }
 
 
+        /**
+         * 将所有节点都放进 documentFragment 里，减少更新渲染时的回流次数
+         * */
         function nodeToFragment(node, vm) {
             var fragment = document.createDocumentFragment();
             var child;
-            while (child = node.firstChild) {
+            while (child = node.firstChild) { // 每添加一个节点进入 documentFragment 里，就会从原来的父节点里删除这个节点
                 compile(child, vm);
                 fragment.appendChild(child);
             }
@@ -69,17 +74,19 @@
         }
 
 
-        /*编译函数*/
+        /* 编译函数
+         * 有2种模板需要处理，并且这2种模板分别是 view => model 和 model => view 2个方向的数据响应
+        */
         function compile(node, vm) {
             var reg = /\{\{(.*)\}\}/; // 来匹配 {{ xxx }} 中的xxx
-            // 如果是元素节点
+            // 如果是元素节点 v-model 绑定
             if (node.nodeType === 1) {
                 var attr = node.attributes;
                 // 解析元素节点的所有属性
                 for (let i = 0; i < attr.length; i++) {
                     if (attr[i].nodeName == 'v-model') {
                         var name = attr[i].nodeValue; // 看看是与哪一个数据相关
-                        node.addEventListener('input', function (e) {
+                        node.addEventListener('input', function (e) { // 添加监听函数，dom 里的 <input> 有变化就会触发属性的 set 函数，即实现了 view => model 这个方向的数据响应
                             vm[name] = e.target.value; // 将实例的text 修改为最新值
                         });
                         node.value = vm[name]; // 将data的值赋给该node
@@ -87,21 +94,24 @@
                     }
                 };
             }
-            // 如果是文本节点
+            // 如果是文本节点 {{}} 绑定
             if (node.nodeType === 3) {
                 if (reg.test(node.nodeValue)) {
                     var name = RegExp.$1; // 获取到匹配的字符串
                     name = name.trim();
                     // node.nodeValue = vm[name];  // 将data的值赋给该node
 
-                    new Watcher(vm, node, name); // 不直接通过赋值的操作，而是通过绑定一个订阅者
+                    // 也就是每出现一处 {{}} 就加一个对这个数据的监听，即往 sub 数组里 push 进一个 Watcher 实例。一旦这个数据由变动，也就是调用了它自己的 set 方法，这个 set 方法里就会触发 dep.notify, 即发布了变动，触发所有的 subs 订阅，所有 {{}} 的地方就会更新。
+                    // 这也是为啥生成 Watcher 实例的时候要传进去 node, 并记录这个 node, 因为要更新节点的 nodeValue 呀
+                    // Dep: 每个数据有一个 Dep 实例； Watcher: 每个引用这个数据的 {{}} 节点处有一个 Watcher 实例，不过不包括 v-model 的节点
+                    new Watcher(vm, node, name); // 不直接通过赋值的操作，而是通过绑定一个订阅者。这里和上面 v-model 不一样，是实现 model => view 这个方向的数据响应，所以是绑定的 Watcher, 不是像上面一样直接赋值
                 }
             }
         }
 
         /*Watcher构造函数*/
         function Watcher(vm, node, name) {
-            Dep.target = this; // Dep.target 是一个全局变量
+            Dep.target = this; // Dep.target 是一个全局变量，是 Dep 构造函数的静态属性
             this.vm = vm;
             this.node = node;
             this.name = name;
@@ -114,26 +124,32 @@
                 this.node.nodeValue = this.value; // 注意，这是更改节点内容的关键
             },
             get() {
-                this.value = this.vm[this.name]; // 触发相应的get
+                this.value = this.vm[this.name]; // 触发相应的get，就会执行 get 里的 dep.addSub, 即这个 Watcher 实例自己把自己添加到响应数据的 dep 中
             }
         }
 
-        /*dep构造函数*/
+        /*dep构造函数
+        * dep 实例有两个方法，分别是添加订阅和触发监听，都和 Watcher 实例息息相关
+        */
         function Dep() {
-            this.subs = [];
+            this.subs = []; // 存入的是一个个的 Watcher 实例
         }
         Dep.prototype = {
             addSub(sub) {
-                this.subs.push(sub);
+                this.subs.push(sub); // 一个属性可能有好多个订阅的事件
             },
             notify() {
                 this.subs.forEach(function (sub) {
-                    sub.update();
+                    sub.update(); // 调用 Watcher 实例的 update 方法
                 })
             }
         }
 
-        /*Vue构造函数*/
+        /*Vue构造函数
+        * 主要做了两件事：第一个是监听数据：observe(data)，第二个是编译 HTML：nodeToFragement(id)。
+        * 在监听数据的过程中，我们会为 data 中的每一个属性生成一个主题对象 dep。
+        * 在编译 HTML 的过程中，会为每个与数据绑定相关的节点生成一个订阅者 watcher，watcher 会将自己添加到相应属性的 dep 容器中
+        */
         function Vue(options) {
             this.data = options.data;
             var data = this.data;

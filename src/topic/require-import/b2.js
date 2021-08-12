@@ -1,4 +1,4 @@
-import { a, obj } from './a2.js'
+import { a, obj } from './a2.js' // 注意和 b1.js 的区别
 
 setTimeout(() => {
   console.log('from b.js:', a, obj.name)

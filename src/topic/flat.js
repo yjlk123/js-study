@@ -5,7 +5,7 @@
 //     let result = []
 //     for (let i = 0; i < arr.length; i++) {
 //         if (arr[i] instanceof Array) {
-//             result = result.concat(myFlat(arr[i]))
+//             result = result.concat(myFlat(arr[i])) // 递归的重点在于返回值，这个返回值既要能处理当前多种条件，还要传给下一层时能用。细品 result
 //         } else {
 //             result.push(arr[i])
 //         }
@@ -41,6 +41,9 @@ console.log(b)
 // https://juejin.cn/post/6855129007852093453#heading-6
 // 指定要提取嵌套数组的结构深度，默认值为 1
 function flatDeep(arr, d = 1) {
+    // 知识点：concat 的参数可以是一个具体的值，也可以是数组，还可以多个数组，很灵活了
+    // 注意 concat 的括号到哪里结束，借助光标查看
+    // 关于层级：如果传进这个函数时层级为0了，那么就直接把当前函数复制一下返回
     return d > 0 ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val),
     []) :
         arr.slice();
